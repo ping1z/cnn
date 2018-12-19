@@ -9,7 +9,7 @@ enum NNActivationType
     Sigmod,
     Tanh,
     Relu,
-    Leaky_Relu
+    Leaky_Relu,
 };
 
 class NNLayerConfig

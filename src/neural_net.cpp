@@ -1,6 +1,7 @@
 #include "neural_net.h"
 
-NeuralNet::NeuralNet(const std::vector<NNLayerConfig> &configs)
+NeuralNet::NeuralNet(const std::vector<NNLayerConfig> &configs, const double l_rate, const double r_rate, const double m_rate)
+: learning_rate {l_rate}, regularization_rate {r_rate}, momentum_rate {m_rate}
 {
     layer_configs = configs;
     num_layers = layer_configs.size();
@@ -8,6 +9,14 @@ NeuralNet::NeuralNet(const std::vector<NNLayerConfig> &configs)
     b_mts.reserve(num_layers);
     w_mts.emplace_back(0, 0);
     b_mts.emplace_back(0, 0);
+
+    // momentum matrix
+    if (momentum_rate > 0.0) {
+        vdw_mts.reserve(num_layers);
+        vdb_mts.reserve(num_layers);
+        vdw_mts.emplace_back(0, 0);
+        vdb_mts.emplace_back(0, 0);
+    }
 
     for (size_t i{1}; i < num_layers; i++)
     {
@@ -23,6 +32,20 @@ NeuralNet::NeuralNet(const std::vector<NNLayerConfig> &configs)
         std::cout << "Bias MT:" << std::endl;
         b_mts.back().print();
         std::cout << std::endl;
+
+        if (momentum_rate > 0.0) {
+            vdw_mts.emplace_back(layer_configs[i].num_unit, layer_configs[i - 1].num_unit, 0.0);
+            vdb_mts.emplace_back(layer_configs[i].num_unit, 1, 0.0);
+
+            std::cout << "V - dWeight MT:" << std::endl;
+            vdw_mts.back().print();
+            std::cout << std::endl;
+
+            std::cout << "V - dBias MT:" << std::endl;
+            vdb_mts.back().print();
+            std::cout << std::endl;
+
+        }
     }
 }
 
@@ -92,11 +115,26 @@ void NeuralNet::backprop(const Matrix &label_mt)
     for (size_t i{1}; i < num_layers; i++)
     {
         Matrix &w = w_mts[i];
-        w = w - Matrix::product(dw_mts.back(), 0.01);
-        dw_mts.pop_back();
-
         Matrix &b = b_mts[i];
-        b = b - Matrix::product(db_mts.back(), 0.01);
+        Matrix &dw = dw_mts.back();
+        Matrix &db = db_mts.back();
+
+        if (regularization_rate > 0.0) {
+            regularization_weight(dw, w, regularization_rate, num_sample);
+        }
+
+        if (momentum_rate > 0.0) {
+            Matrix &vdw = vdw_mts[i];
+            vdw = Matrix::product(vdw, momentum_rate) + Matrix::product(dw, 1.0 - momentum_rate);
+            Matrix &vdb = vdb_mts[i];
+            vdb = Matrix::product(vdb, momentum_rate) + Matrix::product(db, 1.0 - momentum_rate);
+            w = w - Matrix::product(vdw, learning_rate);
+            b = b - Matrix::product(vdb, learning_rate);
+        }else{
+            w = w - Matrix::product(dw_mts.back(), learning_rate);
+            b = b - Matrix::product(db_mts.back(), learning_rate);
+        }
+        dw_mts.pop_back();
         db_mts.pop_back();
     }
 }
@@ -120,6 +158,16 @@ double NeuralNet::calculateCost(const Matrix &label_mt)
             loss -= a_y == 0.0 ? -100.0 : log(a_y);
         }
     }
+
+    //if regularization is enabled 
+    if (regularization_rate > 0.0) {
+        double sqrt_norm = 0.0;
+        for(size_t i {1}; i < w_mts.size(); i++) {
+            sqrt_norm += Matrix::sqrt_norm(w_mts[i]);
+        }
+        loss += sqrt_norm * regularization_rate / 2.0;
+    }
+
     return loss / label_mt.get_cols();
 }
 
@@ -207,6 +255,18 @@ Matrix NeuralNet::dActivation(Matrix &z_mt, NNActivationType &a_type)
         }
     }
     return mt;
+}
+
+void NeuralNet::regularization_weight(Matrix &dw, Matrix &w, const double r_rate, const size_t m) {
+    for (size_t i{0}; i < dw.get_rows(); i++)
+    {
+        for (size_t j{0}; j < dw.get_cols(); j++)
+        {
+            double dw_v = dw.get_value(i, j);
+            double w_v = w.get_value(i, j);
+            dw.set_value(i, j, dw_v + r_rate / m * w_v);
+        }
+    }
 }
 
 double NeuralNet::sigmod(const double val)

@@ -16,6 +16,7 @@ class Matrix
   public:
     //
     Matrix(size_t num_r, size_t num_c);
+    Matrix(size_t num_r, size_t num_c, double default_value);
     Matrix(std::vector<std::vector<double>> data_set);
     Matrix(const Matrix &source);     // copy constructor
     Matrix(Matrix &&source) noexcept; // move constructor
@@ -51,6 +52,7 @@ class Matrix
     static Matrix product(const Matrix &a, const Matrix &b);
     static Matrix product(const Matrix &a, const double b);
     static Matrix transpose(const Matrix &m);
+    static double sqrt_norm(const Matrix &m);
 };
 
 #endif // _MATRIX_H_

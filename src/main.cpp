@@ -16,7 +16,7 @@ int main()
 
     Matrix train_label_mt{train_label};
 
-    NeuralNet net{{{2, NNActivationType::None}, {4, NNActivationType::Leaky_Relu}, {1, NNActivationType::Sigmod}}};
+    NeuralNet net{{{2, NNActivationType::None}, {4, NNActivationType::Leaky_Relu}, {1, NNActivationType::Sigmod}}, 0.1, 0.01, 0.9};
 
     size_t epoch{0};
     double loss = 1.0;

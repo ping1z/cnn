@@ -7,6 +7,18 @@ Matrix::Matrix(size_t num_r, size_t num_c)
     data = (double *)malloc(num_row * num_col * sizeof(double));
 }
 
+Matrix::Matrix(size_t num_r, size_t num_c, double default_value)
+: Matrix {num_r, num_c}
+{
+    for (size_t i{0}; i < num_row; i++)
+    {
+        for (size_t j{0}; j < num_col; j++)
+        {
+            set_value(i, j, default_value);
+        }
+    }
+}
+
 Matrix::Matrix(std::vector<std::vector<double>> data_set)
 {
     num_col = data_set.size();
@@ -272,4 +284,17 @@ Matrix Matrix::transpose(const Matrix &m)
         }
     }
     return tm;
+}
+
+double Matrix::sqrt_norm(const Matrix &m)
+{
+    double norm {0.0};
+    for (size_t i{0}; i < m.get_rows(); i++)
+    {
+        for (size_t j{0}; j < m.get_cols(); j++)
+        {
+            norm += m.get_value(i, j) * m.get_value(i, j);
+        }
+    }
+    return norm;
 }

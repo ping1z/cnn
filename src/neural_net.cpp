@@ -159,14 +159,14 @@ double NeuralNet::calculateCost(const Matrix &label_mt)
         }
     }
 
-    // if regularization is enabled 
-    // if (regularization_rate > 0.0) {
-    //     double sqrt_norm = 0.0;
-    //     for(size_t i {1}; i < w_mts.size(); i++) {
-    //         sqrt_norm += Matrix::sqrt_norm(w_mts[i]);
-    //     }
-    //     loss += sqrt_norm * regularization_rate / 2.0;
-    // }
+    //if regularization is enabled 
+    if (regularization_rate > 0.0) {
+        double sqrt_norm = 0.0;
+        for(size_t i {1}; i < w_mts.size(); i++) {
+            sqrt_norm += Matrix::sqrt_norm(w_mts[i]);
+        }
+        loss += sqrt_norm * regularization_rate / 2.0;
+    }
 
     return loss / label_mt.get_cols();
 }

@@ -4,44 +4,34 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build debug",
+            "label": "Build debug",
             "type": "shell",
-            "command": "make debug",
-            "problemMatcher":"$gcc",
+            "command": "cmake . -B ./build  -DCMAKE_BUILD_TYPE=Debug && make -C ./build",
+            "problemMatcher": "$gcc",
             "group": {
                 "kind": "build",
                 "isDefault": true
-            },
+            }
         },
         {
-            "label": "build run",
+            "label": "Build release",
             "type": "shell",
-            "command": "make run",
-            "problemMatcher":"$gcc",
+            "command": "cmake . -B ./build  -DCMAKE_BUILD_TYPE=Release && make -C ./build",
+            "problemMatcher": "$gcc",
             "group": {
                 "kind": "build",
                 "isDefault": true
-            },
+            }
         },
         {
-            "label": "build",
+            "label": "Build clean",
             "type": "shell",
-            "command": "make",
-            "problemMatcher":"$gcc",
+            "command": "rm -rf ./build/*",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-        },
-        {
-            "label": "clean",
-            "type": "shell",
-            "command": "make clean",
-            "problemMatcher":"$gcc",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "problemMatcher": []
         }
     ]
 }

@@ -5,16 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(lldb) Launch",
+            "name": "(lldb) cnn example",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/cnn",
+            "program": "${workspaceFolder}/build/example/cnn_example",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/build/example",
             "environment": [],
             "externalConsole": true,
             "MIMode": "lldb",
         }
     ]
 }
+

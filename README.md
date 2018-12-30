@@ -24,4 +24,3 @@ shift + command + p, then select a task to execute.
 Select "(lldb) cnn example" configuration.
 
 For more compiler and debugger installation and setup, please see [C/C++ for Visual Studio Code](https://code.visualstudio.com/docs/languages/cpp).
-
